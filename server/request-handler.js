@@ -13,6 +13,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 var requestHandler = function(request, response) {
+module.exports = {}
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -39,7 +40,10 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  //headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/JSON';
+
+
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -70,3 +74,5 @@ var defaultCorsHeaders = {
   'access-control-allow-headers': 'content-type, accept, authorization',
   'access-control-max-age': 10 // Seconds.
 };
+
+module.exports.requestHandler = requestHandler;

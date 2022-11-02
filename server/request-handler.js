@@ -66,10 +66,7 @@ var requestHandler = function(request, response) {
     if (url === messagesPath) {
       statusCode = 200;
       response.writeHead(statusCode, headers);
-      console.log("messages In sever GET: ", messages);
       response.end(JSON.stringify(messages));
-
-      console.log('messages:', messages);
     } else {
       statusCode = 404;
       response.writeHead(statusCode, headers);
@@ -84,7 +81,6 @@ var requestHandler = function(request, response) {
       response.writeHead(statusCode, headers);
 
       var body = '';
-      console.log('messages:', messages);
 
       request.on('error', (err) => {
         console.error(err);
@@ -92,7 +88,6 @@ var requestHandler = function(request, response) {
         body += chunk;
       }).on('end', () => {
         messages.push(JSON.parse(body));
-        console.log('messages after post:', messages);
 
         response.end(JSON.stringify(messages));
 
@@ -107,6 +102,7 @@ var requestHandler = function(request, response) {
         //   messages.push(body);
         //   response.end(JSON.stringify(messages));
         // }
+
       });
     } else {
       statusCode = 404;
@@ -156,6 +152,40 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   //response.end('Hello, World!');
+
+  if (request.method === 'DELETE') {
+    if (url === messagesPath) {
+
+
+
+      var body = '';
+
+      request.on('error', (err) => {
+        console.error(err);
+      }).on('data', (chunk) => {
+        body += chunk;
+      }).on('end', () => {
+        if (messages.includes(JSON.parse(body))) {
+          var index = messages.indexOf(JSON.parse(body));
+          messages.splice(index, 1);
+          console.log()
+          statusCode = 200;
+          response.writeHead(statusCode, headers);
+        } else {
+          statusCode = 404;
+          response.writeHead(statusCode, headers);
+        }
+
+        response.end(JSON.stringify(messages));
+      });
+    } else {
+      statusCode = 204;
+      response.writeHead(statusCode, headers);
+      response.end([{error: 'path not found'}]);
+    }
+  }
+
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).

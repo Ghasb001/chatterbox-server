@@ -60,16 +60,20 @@ var requestHandler = function(request, response) {
   //headers['Content-Type'] = 'text/plain';
   headers['Content-Type'] = 'application/json';
 
+  var acceptableMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+  if (acceptableMethods.indexOf(method) === -1) {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end([{error: 'action not found'}]);
+  }
+
 
 
   if (request.method === 'GET') {
     if (url === messagesPath) {
       statusCode = 200;
       response.writeHead(statusCode, headers);
-      console.log("messages In sever GET: ", messages);
       response.end(JSON.stringify(messages));
-
-      console.log('messages:', messages);
     } else {
       statusCode = 404;
       response.writeHead(statusCode, headers);
@@ -84,7 +88,6 @@ var requestHandler = function(request, response) {
       response.writeHead(statusCode, headers);
 
       var body = '';
-      console.log('messages:', messages);
 
       request.on('error', (err) => {
         console.error(err);
@@ -92,7 +95,6 @@ var requestHandler = function(request, response) {
         body += chunk;
       }).on('end', () => {
         messages.push(JSON.parse(body));
-        console.log('messages after post:', messages);
 
         response.end(JSON.stringify(messages));
 
@@ -107,6 +109,7 @@ var requestHandler = function(request, response) {
         //   messages.push(body);
         //   response.end(JSON.stringify(messages));
         // }
+
       });
     } else {
       statusCode = 404;
@@ -156,6 +159,47 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   //response.end('Hello, World!');
+
+  if (request.method === 'DELETE') {
+    if (url === messagesPath) {
+
+      var body = '';
+      request.on('error', (err) => {
+        console.error(err);
+      }).on('data', (chunk) => {
+        body += chunk;
+      }).on('end', () => {
+        console.log('body', body);
+        console.log('messages', messages);
+        var removed = 0;
+        for (var i = 0; i < messages.length; i++) {
+          for (var key in messages[i]) {
+            if (key in Object.keys(JSON.parse(body)) && messages[i][key] !== body[key]) {
+              break;
+            } else {
+              messages.splice(i, 1);
+              console.log('messages before send', messages);
+              statusCode = 200;
+              response.writeHead(statusCode, headers);
+              removed = 1;
+            }
+          }
+        }
+        if (removed === 0) {
+          statusCode = 404;
+          response.writeHead(statusCode, headers);
+        }
+
+        response.end(JSON.stringify(messages));
+      });
+    } else {
+      statusCode = 204;
+      response.writeHead(statusCode, headers);
+      response.end([{error: 'path not found'}]);
+    }
+  }
+
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).

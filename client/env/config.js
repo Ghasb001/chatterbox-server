@@ -2,9 +2,11 @@
 // request that you make so you don't have to.
 
 // Put your parse application keys here!
+
+
 $.ajaxPrefilter(function (settings, _, jqXHR) {
-  jqXHR.setRequestHeader('Authorization', 'GITHUB_API_TOKEN');
+  jqXHR.setRequestHeader('Authorization', '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');
 });
 
 // Put your campus prefix here
-window.CAMPUS = 'FILL_ME_IN';
+window.CAMPUS = 'RPP=2209'; // TODO

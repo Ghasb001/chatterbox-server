@@ -60,6 +60,13 @@ var requestHandler = function(request, response) {
   //headers['Content-Type'] = 'text/plain';
   headers['Content-Type'] = 'application/json';
 
+  var acceptableMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+  if (acceptableMethods.indexOf(method) === -1) {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end([{error: 'action not found'}]);
+  }
+
 
 
   if (request.method === 'GET') {
@@ -156,22 +163,29 @@ var requestHandler = function(request, response) {
   if (request.method === 'DELETE') {
     if (url === messagesPath) {
 
-
-
       var body = '';
-
       request.on('error', (err) => {
         console.error(err);
       }).on('data', (chunk) => {
         body += chunk;
       }).on('end', () => {
-        if (messages.includes(JSON.parse(body))) {
-          var index = messages.indexOf(JSON.parse(body));
-          messages.splice(index, 1);
-          console.log()
-          statusCode = 200;
-          response.writeHead(statusCode, headers);
-        } else {
+        console.log('body', body);
+        console.log('messages', messages);
+        var removed = 0;
+        for (var i = 0; i < messages.length; i++) {
+          for (var key in messages[i]) {
+            if (key in Object.keys(JSON.parse(body)) && messages[i][key] !== body[key]) {
+              break;
+            } else {
+              messages.splice(i, 1);
+              console.log('messages before send', messages);
+              statusCode = 200;
+              response.writeHead(statusCode, headers);
+              removed = 1;
+            }
+          }
+        }
+        if (removed === 0) {
           statusCode = 404;
           response.writeHead(statusCode, headers);
         }

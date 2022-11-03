@@ -167,8 +167,13 @@ describe('Node Server Request Listener Function', function() {
 
     // expect(res._responseCode).to.equal(200);
     var req3 = new stubs.request('/classes/messages', 'DELETE', stubMsg2);
+    var res3 = new stubs.response();
+
+    handler.requestHandler(req3, res3);
+
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
+    handler.requestHandler(req, res);
 
     var messages = JSON.parse(res._data);
     console.log('messages in delete test', messages);
@@ -176,6 +181,45 @@ describe('Node Server Request Listener Function', function() {
     expect(messages.length).to.equal(1);
     expect(messages[0].username).to.equal('Jono');
     expect(messages[0].text).to.equal('Do my bidding!');
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should return 404 for a nonexistent method', function() {
+    var req = new stubs.request('/classes/messages', 'SOMETHING');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(404);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should save all posted messages on the server', function() {
+    var stubMsg1 = {
+      username: 'Ariel',
+      text: 'FIRST'
+    };
+    var stubMsg2 = {
+      username: 'Guillermo',
+      text: 'SECOND'
+    };
+
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    // Seeing if the messages are actually there
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data);
+    expect(messages.length > 0).to.equal(true);
     expect(res._ended).to.equal(true);
   });
 

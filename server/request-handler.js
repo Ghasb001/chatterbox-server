@@ -22,7 +22,7 @@ var defaultCorsHeaders = {
 var messages = [];
 
 var requestHandler = function(request, response) {
-  module.exports = {};
+  // module.exports = {};
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -77,7 +77,7 @@ var requestHandler = function(request, response) {
     } else {
       statusCode = 404;
       response.writeHead(statusCode, headers);
-      response.end([{error: 'messages not found'}]);
+      response.end(JSON.stringify([{error: 'messages not found'}]));
     }
   }
 
@@ -98,18 +98,6 @@ var requestHandler = function(request, response) {
 
         response.end(JSON.stringify(messages));
 
-        // body = Buffer.concat(body).toString();
-        // if (messages.includes(body)) {
-        //   statusCode = 200;
-        //   response.writeHead(statusCode, headers);
-        //   response.end(JSON.stringify(messages));
-        // } else {
-        //   statusCode = 201;
-        //   response.writeHead(statusCode, headers);
-        //   messages.push(body);
-        //   response.end(JSON.stringify(messages));
-        // }
-
       });
     } else {
       statusCode = 404;
@@ -121,30 +109,7 @@ var requestHandler = function(request, response) {
 
 
 
-  /*
-    let body = [];
-  request.on('error', (err) => {
-    console.error(err);
-  }).on('data', (chunk) => {
-    body.push(chunk);
-  }).on('end', () => {
-    body = Buffer.concat(body).toString();
-    // BEGINNING OF NEW STUFF
 
-    response.on('error', (err) => {
-      console.error(err);
-    });
-
-    response.statusCode = 200;
-    response.setHeader('Content-Type', 'application/json');
-    // Note: the 2 lines above could be replaced with this next one:
-    // response.writeHead(200, {'Content-Type': 'application/json'})
-
-    const responseBody = { headers, method, url, body };
-
-    response.write(JSON.stringify(responseBody));
-    response.end();
-    */
 
 
   // .writeHead() writes to the request line and headers of the response,

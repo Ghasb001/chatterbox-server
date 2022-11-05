@@ -147,40 +147,27 @@ describe('Node Server Request Listener Function', function() {
     };
     var req1 = new stubs.request('/classes/messages', 'POST', stubMsg1);
     var res1 = new stubs.response();
-
     handler.requestHandler(req1, res1);
-
     var stubMsg2 = {
       username: 'JAMES',
       text: 'TEST'
     };
     var req2 = new stubs.request('/classes/messages', 'POST', stubMsg2);
     var res2 = new stubs.response();
-
     handler.requestHandler(req2, res2);
-
     // // Now if we request the log for that room the message we posted should be there:
     // req = new stubs.request('/classes/messages', 'GET');
     // res = new stubs.response();
-
     // handler.requestHandler(req, res);
-
     // expect(res._responseCode).to.equal(200);
     var req3 = new stubs.request('/classes/messages', 'DELETE', stubMsg2);
     var res3 = new stubs.response();
-
     handler.requestHandler(req3, res3);
-
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
     handler.requestHandler(req, res);
-
     var messages = JSON.parse(res._data);
-    console.log('messages in delete test', messages);
-
-    expect(messages.length).to.equal(1);
-    expect(messages[0].username).to.equal('Jono');
-    expect(messages[0].text).to.equal('Do my bidding!');
+    expect(messages.length).to.equal(0);
     expect(res._ended).to.equal(true);
   });
 
@@ -220,6 +207,15 @@ describe('Node Server Request Listener Function', function() {
     expect(res._responseCode).to.equal(200);
     var messages = JSON.parse(res._data);
     expect(messages.length > 0).to.equal(true);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should respond to OPTIONS requests with a 200 status code', function() {
+    var req = new stubs.request('/classes/messages', 'OPTIONS');
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
     expect(res._ended).to.equal(true);
   });
 

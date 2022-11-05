@@ -127,40 +127,30 @@ var requestHandler = function(request, response) {
 
   if (request.method === 'DELETE') {
     if (url === messagesPath) {
-
       var body = '';
       request.on('error', (err) => {
         console.error(err);
       }).on('data', (chunk) => {
         body += chunk;
       }).on('end', () => {
-        console.log('body', body);
-        console.log('messages', messages);
-        var removed = 0;
-        for (var i = 0; i < messages.length; i++) {
-          for (var key in messages[i]) {
-            if (key in Object.keys(JSON.parse(body)) && messages[i][key] !== body[key]) {
-              break;
-            } else {
-              messages.splice(i, 1);
-              console.log('messages before send', messages);
-              statusCode = 200;
-              response.writeHead(statusCode, headers);
-              removed = 1;
-            }
-          }
-        }
-        if (removed === 0) {
-          statusCode = 404;
-          response.writeHead(statusCode, headers);
-        }
-
-        response.end(JSON.stringify(messages));
+        messages = [];
       });
     } else {
       statusCode = 204;
       response.writeHead(statusCode, headers);
       response.end([{error: 'path not found'}]);
+    }
+  }
+
+  if (request.method === 'OPTIONS') {
+    if (url === messagesPath) {
+      statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end();
+    } else {
+      statusCode = 404;
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify([{error: 'options not found'}]));
     }
   }
 
